@@ -1,4 +1,4 @@
-package net
+package srun
 
 import "encoding/base64"
 

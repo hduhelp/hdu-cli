@@ -1,4 +1,31 @@
-package net
+package srun
+
+import (
+	"github.com/hduhelp/api_open_sdk/types"
+	"github.com/parnurzeal/gorequest"
+	"net/url"
+)
+
+func (p *PortalServer) GetUserInfo() (*userInfo, error) {
+	reqUrl := p.apiUri("/cgi-bin/rad_user_info")
+	reqUrl.RawQuery = url.Values{
+		"callback": {p.callback()},
+		"_":        {p.timestampStr},
+	}.Encode()
+	response := new(types.Jsonp)
+	response.Data = new(userInfo)
+	_, body, errs := gorequest.New().Get(reqUrl.String()).End()
+	if len(errs) != 0 {
+		return nil, errs[0]
+	}
+	err := response.UnmarshalJSON([]byte(body))
+	if err != nil {
+		return nil, err
+	}
+
+	p.userInfo = response.Data.(*userInfo)
+	return response.Data.(*userInfo), nil
+}
 
 type userInfo struct {
 	ServerFlag        int64  `json:"ServerFlag"`          //服务器标识
@@ -29,37 +56,4 @@ type userInfo struct {
 	UserMac           string `json:"user_mac"`            //用户MAC
 	UserName          string `json:"user_name"`           //用户名
 	WalletBalance     int    `json:"wallet_balance"`      //钱包余额
-}
-
-type challenge struct {
-	Challenge   string `json:"challenge"` //随机数
-	ClientIp    string `json:"client_ip"` //客户端IP
-	ErrorCode   int    `json:"ecode"`     //错误码
-	Error       string `json:"error"`     //错误信息
-	ErrorMsg    string `json:"error_msg"` //错误信息
-	Expire      string `json:"expire"`    //过期时间 秒
-	OnlineIp    string `json:"online_ip"` //在线IP
-	Res         string `json:"res"`       //返回结果
-	SrunVersion string `json:"srun_ver"`  //版本号
-	Timestamp   int64  `json:"st"`        //时间戳
-}
-
-type portalRequest struct {
-	// 未开启双栈认证，参数为 0
-	// 开启双栈认证，向 Portal 当前页面 IP 认证时，参数为 1
-	// 开启双栈认证，向 Portal 另外一种 IP 认证时，参数为 0
-	DoubleStack string `json:"double_stack"` //双栈
-
-	AcID int `json:"ac_id"` //正在等待中的请求
-}
-
-type portal struct {
-	ClientIp    string `json:"client_ip"` //客户端IP
-	ErrorCode   int    `json:"ecode"`     //错误码
-	Error       string `json:"error"`     //错误信息
-	ErrorMsg    string `json:"error_msg"` //错误信息
-	OnlineIp    string `json:"online_ip"` //在线IP
-	Res         string `json:"res"`       //返回结果
-	SrunVersion string `json:"srun_ver"`  //版本号
-	Timestamp   int64  `json:"st"`        //时间戳
 }
