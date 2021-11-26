@@ -64,12 +64,18 @@ var loginCmd = &cobra.Command{
 
 		cobra.CheckErr(portalServer.SetUsername(viper.GetString("net.auth.username")))
 		cobra.CheckErr(portalServer.SetPassword(viper.GetString("net.auth.password")))
+		info, err := portalServer.GetUserInfo()
+		if viper.GetBool("verbose") {
+			table.PrintStruct(info, "chinese")
+		}
+		cobra.CheckErr(err)
 
 		challenge, err := portalServer.GetChallenge()
 		if viper.GetBool("verbose") {
 			table.PrintStruct(challenge, "chinese")
 		}
 		cobra.CheckErr(err)
+
 		loginResponse, err := portalServer.PortalLogin()
 		table.PrintStruct(loginResponse, "chinese")
 		cobra.CheckErr(err)
