@@ -7,9 +7,13 @@ import (
 	"reflect"
 )
 
+// PrintStruct prints a table of the given struct
 func PrintStruct(in interface{}, tags ...string) {
-	rows := rows(in, tags...)
+	if in == nil {
+		return
+	}
 
+	rows := rows(in, tags...)
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader(append([]string{"Name", "Value"}, tags...))
 	table.SetAlignment(tablewriter.ALIGN_LEFT)
@@ -18,9 +22,9 @@ func PrintStruct(in interface{}, tags ...string) {
 		table.Append(v)
 	}
 	table.Render() // Send output
-
 }
 
+// rows returns a slice of strings representing the struct fields
 func rows(v interface{}, tags ...string) [][]string {
 	t := reflect.TypeOf(v).Elem()
 	r := reflect.ValueOf(v)
