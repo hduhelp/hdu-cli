@@ -2,7 +2,7 @@ package srun
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"github.com/hduhelp/api_open_sdk/types"
 	"github.com/hduhelp/hdu_cli/utils"
 	"github.com/parnurzeal/gorequest"
@@ -32,13 +32,10 @@ func (p *PortalServer) PortalLogin() (*loginResponse, error) {
 		"type":         {"1"},
 		"_":            {p.timestampStr},
 	}.Encode()
-	fmt.Println(p.encryptedUserInfo())
 	response := new(types.Jsonp)
 	response.Data = new(loginResponse)
 	_, body, errs := gorequest.New().Get(reqUrl.String()).End()
 
-	fmt.Println(reqUrl.String())
-	fmt.Println(body)
 	if len(errs) != 0 {
 		return nil, errs[0]
 	}
@@ -47,19 +44,23 @@ func (p *PortalServer) PortalLogin() (*loginResponse, error) {
 		return nil, err
 	}
 
+	if response.Data.(*loginResponse).Error != "ok" {
+		return response.Data.(*loginResponse), errors.New("failed to login i-hdu")
+	}
+
 	p.loginResponse = response.Data.(*loginResponse)
 	return response.Data.(*loginResponse), nil
 }
 
 type loginResponse struct {
-	ClientIp    string      `json:"client_ip"` //客户端IP
-	ErrorCode   interface{} `json:"ecode"`     //错误码
-	Error       string      `json:"error"`     //错误信息
-	ErrorMsg    string      `json:"error_msg"` //错误信息
-	OnlineIp    string      `json:"online_ip"` //在线IP
-	Res         string      `json:"res"`       //返回结果
-	SrunVersion string      `json:"srun_ver"`  //版本号
-	Timestamp   int64       `json:"st"`        //时间戳
+	ClientIp    string      `json:"client_ip" chinese:"客户端IP"` //客户端IP
+	ErrorCode   interface{} `json:"ecode" chinese:"错误码"`       //错误码
+	Error       string      `json:"error" chinese:"错误信息"`      //错误信息
+	ErrorMsg    string      `json:"error_msg" chinese:"错误信息"`  //错误信息
+	OnlineIp    string      `json:"online_ip" chinese:"在线IP"`  //在线IP
+	Res         string      `json:"res" chinese:"返回结果"`        //返回结果
+	SrunVersion string      `json:"srun_ver" chinese:"版本号"`    //版本号
+	Timestamp   int64       `json:"st" chinese:"时间戳"`          //时间戳
 }
 
 func (p PortalServer) encryptedUserInfo() string {
@@ -124,17 +125,21 @@ func (p *PortalServer) PortalLogout() (*logoutResponse, error) {
 		return nil, err
 	}
 
+	if response.Data.(*logoutResponse).Error != "ok" {
+		return response.Data.(*logoutResponse), errors.New("failed to logout i-hdu")
+	}
+
 	p.logoutResponse = response.Data.(*logoutResponse)
 	return response.Data.(*logoutResponse), nil
 }
 
 type logoutResponse struct {
-	ClientIp  string `json:"client_ip"`
-	ErrorCode int    `json:"ecode"`
-	Error     string `json:"error"`
-	ErrorMsg  string `json:"error_msg"`
-	OnlineIp  string `json:"online_ip"`
-	Res       string `json:"res"`
-	SrunVer   string `json:"srun_ver"`
-	St        int    `json:"st"`
+	ClientIp  string      `json:"client_ip"`
+	ErrorCode interface{} `json:"ecode"`
+	Error     string      `json:"error"`
+	ErrorMsg  string      `json:"error_msg"`
+	OnlineIp  string      `json:"online_ip"`
+	Res       string      `json:"res"`
+	SrunVer   string      `json:"srun_ver"`
+	St        int         `json:"st"`
 }

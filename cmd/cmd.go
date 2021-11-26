@@ -10,8 +10,9 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "hdu_cli",
-	Short: "hdu cli",
+	Use:     "hdu_cli",
+	Short:   "hdu cli",
+	Version: "version",
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if v, err := cmd.Flags().GetBool("save"); err == nil && v {
 			if viper.WriteConfig() != nil {
@@ -31,8 +32,8 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.hdu_cli.yaml)")
-
 	rootCmd.PersistentFlags().BoolP("save", "s", false, "save config")
+	rootCmd.PersistentFlags().BoolP("verbose", "V", false, "show more info")
 
 	rootCmd.AddCommand(net.Cmd)
 }

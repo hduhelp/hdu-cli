@@ -1,8 +1,8 @@
 package net
 
 import (
-	"fmt"
 	"github.com/hduhelp/hdu_cli/pkg/srun"
+	"github.com/hduhelp/hdu_cli/pkg/table"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"net/url"
@@ -46,7 +46,8 @@ var infoCmd = &cobra.Command{
 	Short: "show info of your i-hdu network",
 	Run: func(cmd *cobra.Command, args []string) {
 		info, err := portalServer.GetUserInfo()
-		fmt.Println(info, err)
+		cobra.CheckErr(err)
+		table.PrintStruct(info, "chinese")
 	},
 }
 
@@ -57,26 +58,25 @@ var loginCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		cobra.CheckErr(viper.BindPFlag("net.auth.username", cmd.Flags().Lookup("username")))
 		cobra.CheckErr(viper.BindPFlag("net.auth.password", cmd.Flags().Lookup("password")))
-		cobra.CheckErr(viper.BindPFlag("net.auth.daemon", cmd.Flags().Lookup("daemon")))
 
 		cobra.CheckErr(portalServer.SetUsername(viper.GetString("net.auth.username")))
 		cobra.CheckErr(portalServer.SetPassword(viper.GetString("net.auth.password")))
 
 		challenge, err := portalServer.GetChallenge()
 		cobra.CheckErr(err)
-		fmt.Println(challenge, err)
+		if v, err := cmd.Flags().GetBool("verbose"); err == nil && v {
+			table.PrintStruct(challenge, "chinese")
+		}
 		loginResponse, err := portalServer.PortalLogin()
 		cobra.CheckErr(err)
-		fmt.Println(loginResponse, err)
+		table.PrintStruct(loginResponse, "chinese")
 
-		if viper.GetBool("net.auth.daemon") {
+		if v, err := cmd.Flags().GetBool("daemon"); err == nil && v {
 			for {
-				challenge, err := portalServer.GetChallenge()
+				_, err := portalServer.GetChallenge()
 				cobra.CheckErr(err)
-				fmt.Println(challenge, err)
-				loginResponse, err := portalServer.PortalLogin()
+				_, err = portalServer.PortalLogin()
 				cobra.CheckErr(err)
-				fmt.Println(loginResponse, err)
 				time.Sleep(time.Second * 60)
 			}
 		}
@@ -92,8 +92,12 @@ var logoutCmd = &cobra.Command{
 		cobra.CheckErr(portalServer.SetUsername(viper.GetString("net.auth.username")))
 
 		challenge, err := portalServer.GetChallenge()
-		fmt.Println(challenge, err)
+		cobra.CheckErr(err)
+		if v, err := cmd.Flags().GetBool("verbose"); err == nil && v {
+			table.PrintStruct(challenge, "chinese")
+		}
 		logoutResponse, err := portalServer.PortalLogout()
-		fmt.Println(logoutResponse, err)
+		cobra.CheckErr(err)
+		table.PrintStruct(logoutResponse, "chinese")
 	},
 }
