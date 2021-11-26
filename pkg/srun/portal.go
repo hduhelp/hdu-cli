@@ -69,3 +69,16 @@ func (p PortalServer) apiUri(path string) *url.URL {
 	}
 	return uri
 }
+
+type ResponseError struct {
+	ErrorCode interface{} `json:"ecode" chinese:"错误码"`      //错误码
+	Error     string      `json:"error" chinese:"错误信息"`     //错误信息
+	ErrorMsg  string      `json:"error_msg" chinese:"错误信息"` //错误信息
+}
+
+func (e ResponseError) IsOK() (bool, error) {
+	if e.Error != "ok" {
+		return false, errors.New(e.ErrorMsg)
+	}
+	return true, nil
+}

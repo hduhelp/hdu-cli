@@ -6,6 +6,7 @@ import (
 	"github.com/hduhelp/api_open_sdk/types"
 	"github.com/hduhelp/hdu_cli/utils"
 	"github.com/parnurzeal/gorequest"
+	"github.com/spf13/viper"
 	"net/url"
 	"strconv"
 	"time"
@@ -34,6 +35,9 @@ func (p *PortalServer) PortalLogin() (*loginResponse, error) {
 	}.Encode()
 	response := new(types.Jsonp)
 	response.Data = new(loginResponse)
+	if viper.GetBool("verbose") {
+		println(reqUrl.String())
+	}
 	_, body, errs := gorequest.New().Get(reqUrl.String()).End()
 
 	if len(errs) != 0 {
@@ -42,10 +46,6 @@ func (p *PortalServer) PortalLogin() (*loginResponse, error) {
 	err := response.UnmarshalJSON([]byte(body))
 	if err != nil {
 		return nil, err
-	}
-
-	if response.Data.(*loginResponse).Error != "ok" {
-		return response.Data.(*loginResponse), errors.New("failed to login i-hdu")
 	}
 
 	p.loginResponse = response.Data.(*loginResponse)
@@ -61,6 +61,13 @@ type loginResponse struct {
 	Res         string      `json:"res" chinese:"返回结果"`        //返回结果
 	SrunVersion string      `json:"srun_ver" chinese:"版本号"`    //版本号
 	Timestamp   int64       `json:"st" chinese:"时间戳"`          //时间戳
+}
+
+func (r loginResponse) IsOK() (bool, error) {
+	if r.Error != "ok" {
+		return false, errors.New(r.ErrorMsg)
+	}
+	return true, nil
 }
 
 func (p PortalServer) encryptedUserInfo() string {
@@ -115,6 +122,9 @@ func (p *PortalServer) PortalLogout() (*logoutResponse, error) {
 
 	response := new(types.Jsonp)
 	response.Data = new(logoutResponse)
+	if viper.GetBool("verbose") {
+		println(reqUrl.String())
+	}
 	_, body, errs := gorequest.New().Get(reqUrl.String()).End()
 
 	if len(errs) != 0 {
@@ -123,10 +133,6 @@ func (p *PortalServer) PortalLogout() (*logoutResponse, error) {
 	err := response.UnmarshalJSON([]byte(body))
 	if err != nil {
 		return nil, err
-	}
-
-	if response.Data.(*logoutResponse).Error != "ok" {
-		return response.Data.(*logoutResponse), errors.New("failed to logout i-hdu")
 	}
 
 	p.logoutResponse = response.Data.(*logoutResponse)
@@ -142,4 +148,11 @@ type logoutResponse struct {
 	Res       string      `json:"res"`
 	SrunVer   string      `json:"srun_ver"`
 	St        int         `json:"st"`
+}
+
+func (r logoutResponse) IsOK() (bool, error) {
+	if r.Error != "ok" {
+		return false, errors.New(r.ErrorMsg)
+	}
+	return true, nil
 }

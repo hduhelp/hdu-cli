@@ -1,8 +1,10 @@
 package srun
 
 import (
+	"errors"
 	"github.com/hduhelp/api_open_sdk/types"
 	"github.com/parnurzeal/gorequest"
+	"github.com/spf13/viper"
 	"net/url"
 )
 
@@ -16,6 +18,9 @@ func (p *PortalServer) GetChallenge() (*challenge, error) {
 	}.Encode()
 	response := new(types.Jsonp)
 	response.Data = new(challenge)
+	if viper.GetBool("verbose") {
+		println(reqUrl.String())
+	}
 	_, body, errs := gorequest.New().Get(reqUrl.String()).End()
 	if len(errs) != 0 {
 		return nil, errs[0]
@@ -29,11 +34,6 @@ func (p *PortalServer) GetChallenge() (*challenge, error) {
 	return response.Data.(*challenge), nil
 }
 
-func (p PortalServer) ClientIP() string {
-	// 双栈认证时 IP 参数为空
-	return p.challenge.ClientIP
-}
-
 type challenge struct {
 	Challenge   string `json:"challenge" chinese:"随机数 Token"` //随机数 Token
 	ClientIP    string `json:"client_ip" chinese:"客户端IP"`     //客户端IP
@@ -45,4 +45,11 @@ type challenge struct {
 	Res         string `json:"res" chinese:"返回结果"`            //返回结果
 	SrunVersion string `json:"srun_ver" chinese:"版本号"`        //版本号
 	Timestamp   int64  `json:"st" chinese:"时间戳"`              //时间戳
+}
+
+func (r challenge) IsOK() (bool, error) {
+	if r.Error != "ok" {
+		return false, errors.New(r.ErrorMsg)
+	}
+	return true, nil
 }

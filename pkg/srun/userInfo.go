@@ -1,9 +1,10 @@
 package srun
 
 import (
-	"fmt"
+	"errors"
 	"github.com/hduhelp/api_open_sdk/types"
 	"github.com/parnurzeal/gorequest"
+	"github.com/spf13/viper"
 	"net/url"
 )
 
@@ -15,7 +16,9 @@ func (p *PortalServer) GetUserInfo() (*userInfo, error) {
 	}.Encode()
 	response := new(types.Jsonp)
 	response.Data = new(userInfo)
-	fmt.Println(reqUrl.String())
+	if viper.GetBool("verbose") {
+		println(reqUrl.String())
+	}
 	_, body, errs := gorequest.New().Get(reqUrl.String()).End()
 	if len(errs) != 0 {
 		return nil, errs[0]
@@ -58,4 +61,16 @@ type userInfo struct {
 	UserMac           string `json:"user_mac" chinese:"用户MAC"`             //用户MAC
 	UserName          string `json:"user_name" chinese:"用户名"`              //用户名
 	WalletBalance     int    `json:"wallet_balance" chinese:"钱包余额"`        //钱包余额
+}
+
+func (p PortalServer) ClientIP() string {
+	// 双栈认证时 IP 参数为空
+	return p.userInfo.OnlineIp
+}
+
+func (r userInfo) IsOK() (bool, error) {
+	if r.Error != "ok" {
+		return false, errors.New(r.Error)
+	}
+	return true, nil
 }

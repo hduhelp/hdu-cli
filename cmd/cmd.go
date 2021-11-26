@@ -12,10 +12,12 @@ import (
 var rootCmd = &cobra.Command{
 	Use:     "hdu_cli",
 	Short:   "hdu cli",
-	Version: "version",
+	Version: "alpha",
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
-		if v, err := cmd.Flags().GetBool("save"); err == nil && v {
+		if viper.GetBool("save") {
 			if viper.WriteConfig() != nil {
+				viper.Set("verbose", nil)
+				viper.Set("save", nil)
 				cobra.CheckErr(viper.SafeWriteConfig())
 			}
 		}
@@ -33,7 +35,9 @@ func init() {
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.hdu_cli.yaml)")
 	rootCmd.PersistentFlags().BoolP("save", "s", false, "save config")
+	cobra.CheckErr(viper.BindPFlag("save", rootCmd.PersistentFlags().Lookup("save")))
 	rootCmd.PersistentFlags().BoolP("verbose", "V", false, "show more info")
+	cobra.CheckErr(viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose")))
 
 	rootCmd.AddCommand(net.Cmd)
 }

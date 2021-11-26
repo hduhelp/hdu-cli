@@ -1,10 +1,12 @@
 package net
 
 import (
+	"fmt"
 	"github.com/hduhelp/hdu_cli/pkg/srun"
 	"github.com/hduhelp/hdu_cli/pkg/table"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"log"
 	"net/url"
 	"time"
 )
@@ -34,6 +36,7 @@ func init() {
 	loginCmd.Flags().StringP("username", "u", "", "username of srun")
 	loginCmd.Flags().StringP("password", "p", "", "password of srun")
 	loginCmd.Flags().BoolP("daemon", "d", false, "daemon mode")
+	loginCmd.Flags().IntP("interval", "i", 60, "second interval of daemon mode")
 
 	logoutCmd.Flags().StringP("username", "u", "", "username of srun")
 
@@ -63,7 +66,7 @@ var loginCmd = &cobra.Command{
 		cobra.CheckErr(portalServer.SetPassword(viper.GetString("net.auth.password")))
 
 		challenge, err := portalServer.GetChallenge()
-		if v, err := cmd.Flags().GetBool("verbose"); err == nil && v {
+		if viper.GetBool("verbose") {
 			table.PrintStruct(challenge, "chinese")
 		}
 		cobra.CheckErr(err)
@@ -72,14 +75,27 @@ var loginCmd = &cobra.Command{
 		cobra.CheckErr(err)
 
 		if v, err := cmd.Flags().GetBool("daemon"); err == nil && v {
+			interval, _ := cmd.Flags().GetInt("interval")
+			log.Printf("start daemon: check every %d seconds\n", interval)
+			startTime := time.Now()
 			for {
-				_, err := portalServer.GetChallenge()
+				info, err := portalServer.GetUserInfo()
 				cobra.CheckErr(err)
-				_, err = portalServer.PortalLogin()
-				cobra.CheckErr(err)
-				time.Sleep(time.Second * 60)
+				if ok, _ := info.IsOK(); !ok {
+					log.Println("check failed: start retry")
+					_, err = portalServer.GetChallenge()
+					cobra.CheckErr(err)
+					_, err = portalServer.PortalLogin()
+					cobra.CheckErr(err)
+
+					startTime = time.Now()
+				}
+				log.Printf("check succed: live time %fs\n", time.Now().Sub(startTime).Seconds())
+
+				time.Sleep(time.Second * time.Duration(interval))
 			}
 		}
+
 	},
 }
 
@@ -88,14 +104,17 @@ var logoutCmd = &cobra.Command{
 	Use:   "logout",
 	Short: "logout i-hdu of the account",
 	Run: func(cmd *cobra.Command, args []string) {
-		cobra.CheckErr(viper.BindPFlag("net.auth.username", cmd.Flags().Lookup("username")))
-		cobra.CheckErr(portalServer.SetUsername(viper.GetString("net.auth.username")))
-
-		challenge, err := portalServer.GetChallenge()
-		if v, err := cmd.Flags().GetBool("verbose"); err == nil && v {
-			table.PrintStruct(challenge, "chinese")
-		}
+		info, err := portalServer.GetUserInfo()
 		cobra.CheckErr(err)
+		if ok, _ := info.IsOK(); !ok {
+			fmt.Println("you are not login")
+			return
+		}
+		if viper.GetBool("verbose") {
+			table.PrintStruct(info, "chinese")
+		}
+		fmt.Printf("you are logout account %s\n", info.UserName)
+		cobra.CheckErr(portalServer.SetUsername(info.UserName))
 		logoutResponse, err := portalServer.PortalLogout()
 		table.PrintStruct(logoutResponse, "chinese")
 		cobra.CheckErr(err)
