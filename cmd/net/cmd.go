@@ -46,8 +46,8 @@ var infoCmd = &cobra.Command{
 	Short: "show info of your i-hdu network",
 	Run: func(cmd *cobra.Command, args []string) {
 		info, err := portalServer.GetUserInfo()
-		cobra.CheckErr(err)
 		table.PrintStruct(info, "chinese")
+		cobra.CheckErr(err)
 	},
 }
 
@@ -63,13 +63,13 @@ var loginCmd = &cobra.Command{
 		cobra.CheckErr(portalServer.SetPassword(viper.GetString("net.auth.password")))
 
 		challenge, err := portalServer.GetChallenge()
-		cobra.CheckErr(err)
 		if v, err := cmd.Flags().GetBool("verbose"); err == nil && v {
 			table.PrintStruct(challenge, "chinese")
 		}
-		loginResponse, err := portalServer.PortalLogin()
 		cobra.CheckErr(err)
+		loginResponse, err := portalServer.PortalLogin()
 		table.PrintStruct(loginResponse, "chinese")
+		cobra.CheckErr(err)
 
 		if v, err := cmd.Flags().GetBool("daemon"); err == nil && v {
 			for {
@@ -92,12 +92,12 @@ var logoutCmd = &cobra.Command{
 		cobra.CheckErr(portalServer.SetUsername(viper.GetString("net.auth.username")))
 
 		challenge, err := portalServer.GetChallenge()
-		cobra.CheckErr(err)
 		if v, err := cmd.Flags().GetBool("verbose"); err == nil && v {
 			table.PrintStruct(challenge, "chinese")
 		}
-		logoutResponse, err := portalServer.PortalLogout()
 		cobra.CheckErr(err)
+		logoutResponse, err := portalServer.PortalLogout()
 		table.PrintStruct(logoutResponse, "chinese")
+		cobra.CheckErr(err)
 	},
 }
