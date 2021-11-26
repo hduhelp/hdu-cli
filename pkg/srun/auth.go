@@ -100,7 +100,7 @@ func (p *PortalServer) PortalLogout() (*logoutResponse, error) {
 	reqUrl := p.apiUri("/cgi-bin/rad_user_dm")
 
 	timeStr := strconv.FormatInt(time.Now().Unix(), 10)
-	sign := utils.Sha1(timeStr + p.username + "1" + timeStr)
+	sign := utils.Sha1(timeStr + p.username + p.ClientIP() + "1" + timeStr)
 
 	reqUrl.RawQuery = url.Values{
 		"callback": {p.callback()},

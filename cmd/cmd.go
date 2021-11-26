@@ -14,7 +14,9 @@ var rootCmd = &cobra.Command{
 	Short: "hdu cli",
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		if v, err := cmd.Flags().GetBool("save"); err == nil && v {
-			cobra.CheckErr(viper.WriteConfig())
+			if viper.WriteConfig() != nil {
+				cobra.CheckErr(viper.SafeWriteConfig())
+			}
 		}
 	},
 }

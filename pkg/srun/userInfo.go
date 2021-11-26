@@ -1,6 +1,7 @@
 package srun
 
 import (
+	"fmt"
 	"github.com/hduhelp/api_open_sdk/types"
 	"github.com/parnurzeal/gorequest"
 	"net/url"
@@ -14,6 +15,7 @@ func (p *PortalServer) GetUserInfo() (*userInfo, error) {
 	}.Encode()
 	response := new(types.Jsonp)
 	response.Data = new(userInfo)
+	fmt.Println(reqUrl.String())
 	_, body, errs := gorequest.New().Get(reqUrl.String()).End()
 	if len(errs) != 0 {
 		return nil, errs[0]
