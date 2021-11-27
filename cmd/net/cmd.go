@@ -2,8 +2,8 @@ package net
 
 import (
 	"fmt"
-	"github.com/hduhelp/hdu_cli/pkg/srun"
-	"github.com/hduhelp/hdu_cli/pkg/table"
+	"github.com/hduhelp/hdu-cli/pkg/srun"
+	"github.com/hduhelp/hdu-cli/pkg/table"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"log"

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/hduhelp/hdu_cli/cmd"
+	"github.com/hduhelp/hdu-cli/cmd"
 )
 
 func main() {

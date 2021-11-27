@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/hduhelp/api_open_sdk/types"
-	"github.com/hduhelp/hdu_cli/utils"
+	"github.com/hduhelp/hdu-cli/utils"
 	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/viper"
 	"net/url"

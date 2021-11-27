@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/hduhelp/hdu_cli/cmd/net"
+	"github.com/hduhelp/hdu-cli/cmd/net"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -33,7 +33,7 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.hdu_cli.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.hdu-cli.yaml)")
 	rootCmd.PersistentFlags().BoolP("save", "s", false, "save config")
 	cobra.CheckErr(viper.BindPFlag("save", rootCmd.PersistentFlags().Lookup("save")))
 	rootCmd.PersistentFlags().BoolP("verbose", "V", false, "show more info")
@@ -57,7 +57,7 @@ func initConfig() {
 		// Search config in home directory with name ".hdu_cli" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigType("yaml")
-		viper.SetConfigName(".hdu_cli")
+		viper.SetConfigName(".hdu-cli")
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

@@ -1,14 +1,14 @@
-# hdu_cli
+# hdu-cli
 
 ## Installation Or Upgrade
 
 ```shell
-go install github.com/hduhelp/hdu_cli@latest
+go install github.com/hduhelp/hdu-cli@latest
 ```
 
 ## Usage
 
-### hdu_cli [command]
+### hdu-cli [command]
 
 ### Available Commands:
 
@@ -18,7 +18,7 @@ go install github.com/hduhelp/hdu_cli@latest
 
 ### Flags:
 
-- --config string   config file (default is $HOME/.hdu_cli.yaml)
+- --config string   config file (default is $HOME/.hdu-cli.yaml)
 - -h, --help            help for hdu_cli
 - -s, --save            save config
 - -V, --verbose         show more info

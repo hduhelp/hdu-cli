@@ -1,4 +1,4 @@
-module github.com/hduhelp/hdu_cli
+module github.com/hduhelp/hdu-cli
 
 go 1.17
 
