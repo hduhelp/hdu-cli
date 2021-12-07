@@ -11,7 +11,7 @@ go install github.com/hduhelp/hdu-cli@latest
 
 > The Command may need root privilege
 >
-> and sometimes go env is not install completely on your root account
+> and sometimes go env is not install completely on your root account (sudo mode)
 >
 > so try like `sudo $GOROOT/bin/go install github.com/hduhelp/hdu-cli@latest`
 > 
