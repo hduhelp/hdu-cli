@@ -1,0 +1,8 @@
+net:
+    auth:
+        # i-HDU wifi login
+        # username always is your student id like 20051101
+        # password is what u know
+        # and put the file at your home directory
+        username: 20051101
+        password: password
