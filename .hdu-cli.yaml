@@ -10,6 +10,6 @@ net:
         # Auto method
         # hdu-cli net login --username 20051101 --password your-password
         # After Testing on my Kali linux The ( -s / -d ) option seems not work correctly.
-        # if you konw &! or
+        # There need further debugging.
         username: 20051101
         password: your-password
