@@ -1,0 +1,15 @@
+net:
+    auth:
+        # i-HDU wifi login
+        #
+        # Manually method
+        # username always is your student id like 20051101
+        # password is what u know
+        # and put the file at your home directory
+        #
+        # Auto method
+        # hdu-cli net login --username 20051101 --password your-password
+        # After Testing on my Kali linux The ( -s / -d ) option seems not work correctly.
+        # There need further debugging.
+        username: 20051101
+        password: your-password
