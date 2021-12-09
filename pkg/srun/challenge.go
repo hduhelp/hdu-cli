@@ -8,13 +8,13 @@ import (
 	"net/url"
 )
 
-func (p *PortalServer) GetChallenge() (*challenge, error) {
-	reqUrl := p.apiUri("/cgi-bin/get_challenge")
+func (s *PortalServer) GetChallenge() (*challenge, error) {
+	reqUrl := s.apiUri("/cgi-bin/get_challenge")
 	reqUrl.RawQuery = url.Values{
-		"callback": {p.callback()},
-		"username": {p.username},
+		"callback": {s.callback()},
+		"username": {s.username},
 		//"ip":       {p.ClientIP()},
-		"_": {p.timestampStr},
+		"_": {s.timestampStr},
 	}.Encode()
 	response := new(types.Jsonp)
 	response.Data = new(challenge)
@@ -30,7 +30,7 @@ func (p *PortalServer) GetChallenge() (*challenge, error) {
 		return nil, err
 	}
 
-	p.challenge = response.Data.(*challenge)
+	s.challenge = response.Data.(*challenge)
 	return response.Data.(*challenge), nil
 }
 

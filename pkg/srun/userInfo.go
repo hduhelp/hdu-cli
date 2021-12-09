@@ -8,11 +8,11 @@ import (
 	"net/url"
 )
 
-func (p *PortalServer) GetUserInfo() (*userInfo, error) {
-	reqUrl := p.apiUri("/cgi-bin/rad_user_info")
+func (s *PortalServer) GetUserInfo() (*userInfo, error) {
+	reqUrl := s.apiUri("/cgi-bin/rad_user_info")
 	reqUrl.RawQuery = url.Values{
-		"callback": {p.callback()},
-		"_":        {p.timestampStr},
+		"callback": {s.callback()},
+		"_":        {s.timestampStr},
 	}.Encode()
 	response := new(types.Jsonp)
 	response.Data = new(userInfo)
@@ -28,7 +28,7 @@ func (p *PortalServer) GetUserInfo() (*userInfo, error) {
 		return nil, err
 	}
 
-	p.userInfo = response.Data.(*userInfo)
+	s.userInfo = response.Data.(*userInfo)
 	return response.Data.(*userInfo), nil
 }
 
@@ -63,9 +63,9 @@ type userInfo struct {
 	WalletBalance     int    `json:"wallet_balance" chinese:"钱包余额"`        //钱包余额
 }
 
-func (p PortalServer) ClientIP() string {
+func (s PortalServer) ClientIP() string {
 	// 双栈认证时 IP 参数为空
-	return p.userInfo.OnlineIp
+	return s.userInfo.OnlineIp
 }
 
 func (r userInfo) IsOK() (bool, error) {

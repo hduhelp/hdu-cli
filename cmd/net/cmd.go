@@ -85,6 +85,15 @@ var loginCmd = &cobra.Command{
 			log.Printf("start daemon: check every %d seconds\n", interval)
 			startTime := time.Now()
 			for {
+				//检测是否能访问互联网，如果不能，则退出登录并尝试重新登录
+				if !portalServer.Internet() {
+					log.Println("internet is not available, try to login again")
+					_, err := portalServer.PortalLogout()
+					cobra.CheckErr(err)
+					break
+				}
+
+				//检测是否登录成功，如果登录过期则重新登录
 				info, err := portalServer.GetUserInfo()
 				cobra.CheckErr(err)
 				if ok, _ := info.IsOK(); !ok {

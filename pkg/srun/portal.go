@@ -17,19 +17,27 @@ func New(endpoint, acID string) *PortalServer {
 	}
 }
 
-func (p *PortalServer) SetUsername(username string) error {
+func (s *PortalServer) SetUsername(username string) error {
 	if username == "" {
 		return errors.New("username is empty")
 	}
-	p.username = username
+	s.username = username
 	return nil
 }
 
-func (p *PortalServer) SetPassword(password string) error {
+func (s *PortalServer) SetPassword(password string) error {
 	if password == "" {
 		return errors.New("password is empty")
 	}
-	p.password = password
+	s.password = password
+	return nil
+}
+
+func (s *PortalServer) SetInternetCheckEndpoint(uri string) error {
+	if _, err := url.ParseRequestURI(uri); err != nil {
+		return err
+	}
+	s.internetCheck = uri
 	return nil
 }
 
@@ -38,6 +46,8 @@ type PortalServer struct {
 	// AcID NasID?
 	acID          string
 	jsonpCallback string
+
+	internetCheck string
 
 	username string
 	password string
@@ -50,20 +60,20 @@ type PortalServer struct {
 	logoutResponse *logoutResponse
 }
 
-func (p PortalServer) callback() string {
-	return p.jsonpCallback
+func (s PortalServer) callback() string {
+	return s.jsonpCallback
 }
 
-func (p *PortalServer) SetAcID(acID string) {
-	p.acID = acID
+func (s *PortalServer) SetAcID(acID string) {
+	s.acID = acID
 }
 
-func (p PortalServer) AcID() string {
-	return p.acID
+func (s PortalServer) AcID() string {
+	return s.acID
 }
 
-func (p PortalServer) apiUri(path string) *url.URL {
-	uri, err := url.ParseRequestURI(p.endPoint + path)
+func (s PortalServer) apiUri(path string) *url.URL {
+	uri, err := url.ParseRequestURI(s.endPoint + path)
 	if err != nil {
 		panic("endpoint uri error")
 	}
