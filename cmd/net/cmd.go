@@ -88,8 +88,9 @@ var loginCmd = &cobra.Command{
 				//检测是否能访问互联网，如果不能，则退出登录并尝试重新登录
 				if !portalServer.Internet() {
 					log.Println("internet is not available, try to login again")
-					_, err := portalServer.PortalLogout()
-					cobra.CheckErr(err)
+					if _, err := portalServer.PortalLogout(); err != nil {
+						log.Println(err)
+					}
 					break
 				}
 
