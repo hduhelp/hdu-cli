@@ -91,7 +91,7 @@ var loginCmd = &cobra.Command{
 					if _, err := portalServer.PortalLogout(); err != nil {
 						log.Println(err)
 					}
-					break
+					continue
 				}
 
 				//检测是否登录成功，如果登录过期则重新登录
