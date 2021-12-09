@@ -12,7 +12,7 @@ func (s PortalServer) Internet() bool {
 	reqUrl, _ := url.ParseRequestURI(s.internetCheck)
 	gorequest.New().Get(reqUrl.String()).
 		RedirectPolicy(func(req gorequest.Request, via []gorequest.Request) error {
-			redirected = req.URL.Hostname() != reqUrl.Hostname()
+			redirected = req.URL.Hostname() == reqUrl.Hostname()
 			return http.ErrUseLastResponse
 		}).End()
 	return redirected
