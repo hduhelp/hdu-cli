@@ -14,6 +14,7 @@ func New(endpoint, acID string) *PortalServer {
 		acID:          acID,
 		jsonpCallback: "jQuery112403771213770126085_" + timestampStr,
 		timestampStr:  timestampStr,
+		internetCheck: "http://www.baidu.com",
 	}
 }
 
