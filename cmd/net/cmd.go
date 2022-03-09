@@ -31,7 +31,7 @@ func init() {
 	cobra.CheckErr(viper.BindPFlag("net.endpoint", Cmd.PersistentFlags().Lookup("endpoint")))
 
 	Cmd.PersistentFlags().StringP("acid", "a", "", "ac_id of srun")
-	resp, _, errs := gorequest.New().Get(viper.GetString("net.endpoint")).End()
+	resp, _, errs := gorequest.New().Get("http://www.baidu.com").End()
 	if errs != nil {
 		viper.SetDefault("net.acid", "0")
 	} else if acid := resp.Request.URL.Query().Get("ac_id"); acid != "" {
