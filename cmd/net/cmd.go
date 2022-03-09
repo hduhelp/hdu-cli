@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/hduhelp/hdu-cli/pkg/srun"
 	"github.com/hduhelp/hdu-cli/pkg/table"
+	"github.com/parnurzeal/gorequest"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"log"
@@ -30,7 +31,14 @@ func init() {
 	cobra.CheckErr(viper.BindPFlag("net.endpoint", Cmd.PersistentFlags().Lookup("endpoint")))
 
 	Cmd.PersistentFlags().StringP("acid", "a", "", "ac_id of srun")
-	viper.SetDefault("net.acid", "0")
+	resp, _, errs := gorequest.New().Get(viper.GetString("net.endpoint")).End()
+	if errs != nil {
+		viper.SetDefault("net.acid", "0")
+	} else if acid := resp.Request.URL.Query().Get("ac_id"); acid != "" {
+		viper.SetDefault("net.acid", acid)
+	} else {
+		viper.SetDefault("net.acid", "0")
+	}
 	cobra.CheckErr(viper.BindPFlag("net.acid", Cmd.PersistentFlags().Lookup("acid")))
 
 	loginCmd.Flags().StringP("username", "u", "", "username of srun")
@@ -40,7 +48,7 @@ func init() {
 
 	logoutCmd.Flags().StringP("username", "u", "", "username of srun")
 
-	Cmd.AddCommand(infoCmd, loginCmd, logoutCmd)
+	Cmd.AddCommand(infoCmd, loginCmd, logoutCmd, internetCmd)
 }
 
 // infoCmd represents the info command
@@ -91,7 +99,6 @@ var loginCmd = &cobra.Command{
 					if _, err := portalServer.PortalLogout(); err != nil {
 						log.Println(err)
 					}
-					continue
 				}
 
 				//检测是否登录成功，如果登录过期则重新登录
@@ -134,5 +141,14 @@ var logoutCmd = &cobra.Command{
 		logoutResponse, err := portalServer.PortalLogout()
 		table.PrintStruct(logoutResponse, "chinese")
 		cobra.CheckErr(err)
+	},
+}
+
+// internetCmd represents the logout command
+var internetCmd = &cobra.Command{
+	Use:   "internet",
+	Short: "check if connect to the internet",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println(portalServer.Internet())
 	},
 }
