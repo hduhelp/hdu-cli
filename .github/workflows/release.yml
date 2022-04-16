@@ -18,7 +18,6 @@ jobs:
   build:
     name: 编译并发布版本
     runs-on: ubuntu-latest
-    if: github.event.inputs.build == 'true'
     steps:
       - name: 准备代码
         uses: actions/checkout@v2
