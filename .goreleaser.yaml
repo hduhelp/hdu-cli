@@ -34,7 +34,7 @@ release:
     此处是版本介绍
 
   footer: |
-    ## 谢谢!
+    ## 感谢您的支持!
 
     以上就是在 {{ .Tag }} 上的改动!
   name_template: "{{.ProjectName}}-v{{.Version}} {{.Env.USER}}"
@@ -83,4 +83,4 @@ publishers:
     ids:
       - packages
     dir: "{{ dir .ArtifactPath }}"
-    cmd: curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/netdevops/
+    cmd: curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/{{ .Env.FURY_USER_NAME }}/

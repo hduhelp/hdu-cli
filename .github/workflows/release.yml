@@ -1,11 +1,14 @@
 name: 发版
 on:
-  workflow_dispatch:
-    inputs:
-      build:
-        description: '发版，请输入true'
-        required: true
-        default: 'true'
+  push:
+    tags:
+      - 'v*'
+#  workflow_dispatch:
+#    inputs:
+#      build:
+#        description: '发版，请输入true'
+#        required: true
+#        default: 'true'
 #      version_description:
 #        description: '输入版本描述'
 #        required: true
@@ -38,3 +41,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
+          FURY_USER_NAME: at0m
