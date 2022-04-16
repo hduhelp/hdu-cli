@@ -1046,7 +1046,7 @@ var Portal = /*#__PURE__*/function (_Utils) {
                         // 更改查询状态为结束
                         _this.running.checkProt = false; // 用户同意了哪些协议
 
-                        _this.userInfo.agreedList = res.data; // 把用户同意过的协议存在 cookie
+                        _this.userInfo.agreedList = res.data; // 把用户同意的协议存在 cookie
 
                         _this.setCookie('protocol', JSON.stringify(res.data)); // 用户同意最新协议
 

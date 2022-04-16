@@ -4,3 +4,4 @@ hdu-cli
 .hdu_cli.yaml
 .idea
 /vendor
+dist/

@@ -1,0 +1,37 @@
+name: 发版
+on:
+  workflow_dispatch:
+    inputs:
+      build:
+        description: '发版，请输入true'
+        required: true
+        default: 'true'
+#      version_description:
+#        description: '输入版本描述'
+#        required: true
+#        default: '升级内容：性能优化 | bug修复'
+
+jobs:
+  build:
+    name: 编译并发布版本
+    runs-on: ubuntu-latest
+    if: github.event.inputs.build == 'true'
+    steps:
+      - name: 准备代码
+        uses: actions/checkout@v2
+
+      - name: 准备编译环境
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.17'
+
+      - name: 运行GoReleaser发版
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          # either 'goreleaser' (default) or 'goreleaser-pro'
+          distribution: goreleaser
+          version: latest
+          args: release --rm-dist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FURY_TOKEN: ${{ secrets.FURY_TOKEN }}
