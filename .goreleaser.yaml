@@ -34,7 +34,6 @@ changelog:
       - '^test:'
 
 release:
-  draft: true
   header: |
     ## Hi! 欢迎使用HDU-CLI ({{ .Date }})
 
