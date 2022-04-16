@@ -19,6 +19,11 @@ jobs:
     steps:
       - name: 准备代码
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: 获取git标签
+        run: git fetch --force --tags
 
       - name: 准备编译环境
         uses: actions/setup-go@v3
@@ -26,7 +31,7 @@ jobs:
           go-version: '1.17'
 
       - name: 运行GoReleaser发版
-        uses: goreleaser/goreleaser-action@latest
+        uses: goreleaser/goreleaser-action@v2
         with:
           distribution: goreleaser
           version: latest
