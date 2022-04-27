@@ -2,10 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
+	"github.com/hduhelp/hdu-cli/cmd/auth"
 	"github.com/hduhelp/hdu-cli/cmd/net"
+	"github.com/hduhelp/hdu-cli/cmd/rpc"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"os"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -39,7 +42,7 @@ func init() {
 	rootCmd.PersistentFlags().BoolP("verbose", "V", false, "show more info")
 	cobra.CheckErr(viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose")))
 
-	rootCmd.AddCommand(net.Cmd)
+	rootCmd.AddCommand(net.Cmd, auth.Cmd, rpc.Cmd)
 }
 
 var cfgFile string

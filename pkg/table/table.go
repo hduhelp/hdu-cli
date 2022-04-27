@@ -2,9 +2,10 @@ package table
 
 import (
 	"fmt"
-	"github.com/olekukonko/tablewriter"
 	"os"
 	"reflect"
+
+	"github.com/olekukonko/tablewriter"
 )
 
 // PrintStruct prints a table of the given struct
@@ -34,6 +35,9 @@ func rows(v interface{}, tags ...string) [][]string {
 	for i := 0; i < t.NumField(); i++ {
 		row := make([]string, 0)
 		field := t.Field(i)
+		if !field.IsExported() {
+			continue
+		}
 		row = append(row,
 			field.Name,
 			fmt.Sprint(reflect.Indirect(r).FieldByName(field.Name)),
