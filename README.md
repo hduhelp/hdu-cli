@@ -6,6 +6,18 @@
 go install github.com/hduhelp/hdu-cli@latest
 ```
 
+or direct download the release file which suffix match your platform.
+
+## Startup
+
+use command like
+
+```
+hdu-cli net login --username {Your student number} --password {Your HDU Cas Password} --save
+```
+
+or manually use the .hdu-cli.yaml and fill according the comments
+
 <details>
 <summary>Trouble shoot</summary>
 
