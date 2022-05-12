@@ -3,6 +3,7 @@ package rpc
 import (
 	"fmt"
 	"github.com/hduhelp/hdu-cli/utils"
+	"github.com/spf13/viper"
 	"sort"
 
 	"github.com/manifoldco/promptui"
@@ -47,11 +48,20 @@ var execCmd = &cobra.Command{
 	},
 }
 
+// authCmd set tokens for your rpc.
 var authCmd = &cobra.Command{
-	Use:   "auth",
+	Use:   "auth your_token",
 	Short: "auth rpc command (Pure Command Mode)",
 	Run: func(cmd *cobra.Command, args []string) {
-		// todo: auth
+		// todo: auth // need re-design
+		if viper.GetString("auth.token") == "" {
+			if viper.WriteConfig() != nil {
+				viper.Set("auth.token", args[0])
+				cobra.CheckErr(viper.SafeWriteConfig())
+			}
+		} else {
+			fmt.Println("token already set")
+		}
 	},
 }
 
