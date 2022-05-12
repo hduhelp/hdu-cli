@@ -40,3 +40,13 @@ func EncodeMD5(data, key string) string {
 	mac.Write([]byte(data))
 	return hex.EncodeToString(mac.Sum(nil))
 }
+
+// In method is find if the string is in the array.
+func In(s string, ss []string) bool {
+	for _, v := range ss {
+		if s == v {
+			return true
+		}
+	}
+	return false
+}
