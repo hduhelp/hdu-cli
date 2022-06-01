@@ -20,6 +20,15 @@ import (
 
 var clients = make(map[string]any)
 
+var clientRegisters = []any{
+	authv1.NewAuthServiceClient,
+	staffv1.NewCampusServiceClient,
+	teachingv1.NewTeachingServiceClient,
+	healthv1.NewHealthServiceClient,
+	schooltimev1.NewSchoolTimeServiceClient,
+	libraryv1.NewLibraryServiceClient,
+}
+
 var methods = make(map[string][]string)
 
 func registerClient(client any) {
@@ -31,18 +40,10 @@ func registerClient(client any) {
 	methods[t.Out(0).String()] = m
 }
 
-var clientRegisters = []any{
-	authv1.NewAuthServiceClient,
-	staffv1.NewCampusServiceClient,
-	teachingv1.NewTeachingServiceClient,
-	healthv1.NewHealthServiceClient,
-	schooltimev1.NewSchoolTimeServiceClient,
-	libraryv1.NewLibraryServiceClient,
-}
-
 func initMethods() {
 	for _, client := range clientRegisters {
 		registerClient(client)
+		clients[reflect.TypeOf(client).String()] = client
 	}
 }
 
@@ -51,16 +52,16 @@ func printJson(in any) {
 	fmt.Println(string(b))
 }
 
-func newClient(service string) reflect.Value {
-	conn := grpcclient.Conn(context.Background())
+func newClient(ctx context.Context, service string) (reflect.Value, context.Context) {
+	conn := grpcclient.Conn(ctx)
 	for _, client := range clientRegisters {
 		if reflect.TypeOf(client).Out(0).String() == service {
 			f := reflect.ValueOf(client)
 			resultValues := f.Call([]reflect.Value{reflect.ValueOf(conn)})
-			return resultValues[0]
+			return resultValues[0], ctx
 		}
 	}
-	return reflect.Value{}
+	return reflect.Value{}, ctx
 }
 
 func listMethodsByServiceName(n string) {
@@ -72,10 +73,31 @@ func listMethods() {
 	printJson(methods)
 }
 
+/*
+	ctx := context.Background()
+	ctx = grpcclient.WithToken(ctx, "_YOUR_TOKEN_")
+	grpcInterface := grpcclient.Conn(ctx)
+	AuthClient := authv1.NewAuthServiceClient(grpcInterface)
+	resp, err := AuthClient.GetTokenInfo(ctx, &emptypb.Empty{})
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		println(resp)
+	}
+*/
 // execMethod execute the method of the client
 // todo: fix the bug of zero value
 func execMethod(service string, method string, args ...string) {
-	client := newClient(service)
+	token := viper.GetString("auth.token")
+	if token == "" {
+		fmt.Println("No Token.")
+		return
+	}
+
+	ctx := context.Background()
+	ctx = grpcclient.WithToken(ctx, token)
+
+	client, ctx := newClient(ctx, service)
 	methodF := client.MethodByName(method)
 	req := methodF.Type().In(1)
 	var reqValue reflect.Value
@@ -92,19 +114,18 @@ func execMethod(service string, method string, args ...string) {
 		// }
 	}
 	fmt.Println(reqValue)
-	if token := viper.GetString("auth.token"); token == "" {
-		fmt.Println("No Auth Token")
+
+	result := methodF.Call([]reflect.Value{
+		reflect.ValueOf(ctx),
+		reqValue,
+	})
+
+	// Seems It Work?
+	if result[0].Interface() != nil {
+		fmt.Println("Error Response Got: ")
+		fmt.Println(result[1].Interface())
 	} else {
-		ctx := grpcclient.WithToken(context.Background(), token)
-		result := methodF.Call([]reflect.Value{
-			reflect.ValueOf(ctx),
-			reqValue,
-		})
-		if result[0].Interface() != nil {
-			panic("error: result find nil")
-		} else {
-			table.PrintStruct(result[0].Interface())
-			fmt.Println(result[1])
-		}
+		table.PrintStruct(result[0].Interface())
+		fmt.Println(result[1])
 	}
 }
