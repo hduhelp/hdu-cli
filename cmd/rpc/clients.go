@@ -120,12 +120,23 @@ func execMethod(service string, method string, args ...string) {
 		reqValue,
 	})
 
-	// Seems It Work?
-	if result[0].Interface() != nil {
-		fmt.Println("Error Response Got: ")
-		fmt.Println(result[1].Interface())
+	// result[1].Type().String() == error
+	// result[0].Type().String() == client Response
+	// error is Empty
+	err := result[1].Interface().(error)
+	if err != nil {
+		fmt.Println("Rpc is called But got unknown Error")
+		fmt.Println(err)
+		return
+	}
+
+	// response
+	response := result[0].Interface()
+	if response == nil {
+		fmt.Println("Error Bad nil Response.")
 	} else {
 		table.PrintStruct(result[0].Interface())
 		fmt.Println(result[1])
 	}
+	return
 }
